@@ -4,6 +4,7 @@ var minify = (function(undefined) {
 			_fs = require('fs');
 
 	var minify = function(options) {
+		
 		this.type = options.type;
 		this.tempFile = (options.tempPath || '') + new Date().getTime().toString();
 
@@ -39,34 +40,50 @@ var minify = (function(undefined) {
 	};
 
 	minify.prototype = minify.fn = {
-		type: null,
-		fileIn: null,
-		fileOut: null,
-		callback: null,
-		buffer: null, // with larger files you will need a bigger buffer for closure compiler
-		compress: function() {
-			var self = this, command;
+		type 		: null,
+		fileIn 		: null,
+		fileOut 	: null,
+		callback 	: null,
+		buffer 		: null, // with larger files you will need a bigger buffer for closure compiler
+		compress	: function() {
+			var self = this, command, fileInCommand;
 
 			switch (this.type) {
 				case 'yui':
 				case 'yui-css':
-					command = 'java -jar -Xss2048k "' + __dirname + '/yuicompressor-2.4.7.jar" "' + this.fileIn + '" -o "' + this.fileOut + '" --type css ' + this.options.join(' ');
+					command = 'java -jar -Xss2048k "' +
+								__dirname +
+								'/yuicompressor-2.4.7.jar" "' +
+								this.fileIn +
+								'" -o "' +
+								this.fileOut +
+								'" --type css ' +
+								this.options.join(' ');
 					break;
 				case 'yui-js':
-					command = 'java -jar -Xss2048k "' + __dirname + '/yuicompressor-2.4.7.jar" "' + this.fileIn + '" -o "' + this.fileOut + '" --type js ' + this.options.join(' ');
+					command = 'java -jar -Xss2048k "' +
+								__dirname +
+								'/yuicompressor-2.4.7.jar" "' +
+								this.fileIn + '" -o "' +
+								this.fileOut +
+								'" --type js '
+								+ this.options.join(' ');
 					break;
 				case 'gcc':
-					var fileInCommand = this.fileIn.map(function(file) {
+					fileInCommand = this.fileIn.map(function(file) {
 						return '--js="' + file + '"';
 					});
-					command = 'java -jar "' + __dirname + '/google_closure_compiler-r1918.jar" ' + fileInCommand.join(' ') + ' --js_output_file="' + this.fileOut + '" ' + this.options.join(' ');
+					command = 'java -jar "' +
+								__dirname +
+								'/google_closure_compiler-r1918.jar" ' +
+								fileInCommand.join(' ') +
+								' --js_output_file="' +
+								this.fileOut +
+								'" ' +
+								this.options.join(' ');
 					break;
 				case 'uglifyjs':
 					command = '"' + __dirname  + '/node_modules/uglify-js/bin/uglifyjs" --output "' + this.fileOut + '" --no-copyright "' + this.fileIn + '" ' + this.options.join(' ');
-					break;
-				// Useful when wanting only to concatenate the files and not to compress them
-				case 'no-compress':
-					command = 'cp ' + this.fileIn + ' ' + this.fileOut;
 					break;
 			}
 
@@ -89,8 +106,7 @@ var minify = (function(undefined) {
 	};
 
 	return minify;
-
-})();
+}());
 
 exports.version = '0.4.2';
 exports.minify = minify;
