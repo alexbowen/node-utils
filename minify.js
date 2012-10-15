@@ -1,8 +1,7 @@
 var minify = (function(undefined) {
 
 	var exec = require('child_process').exec,
-		_fs = require('fs'),
-		out;
+		_fs = require('fs');
 
 	/**
 	 * minify.js
@@ -12,8 +11,7 @@ var minify = (function(undefined) {
 	 */
 	var minify = function(options) {
 
-		this.type = options.type;
-		this.tempFile = (options.tempPath || '') + new Date().getTime().toString();
+		this.type = options.type
 
 		//prepare input file format
 		if (options.type == 'gcc' && typeof options.fileIn === 'string') {
@@ -24,13 +22,9 @@ var minify = (function(undefined) {
 
 		//read the file contents
 		if (typeof options.fileIn === 'object' && options.fileIn instanceof Array && options.type != 'gcc') {
-			out = options.fileIn.map(function(path) {
+			this.fileIn = options.fileIn.map(function(path) {
 				return _fs.readFileSync(path, 'utf8');
 			});
-
-			_fs.writeFileSync(this.tempFile, out.join('\n'), 'utf8');
-
-			this.fileIn = this.tempFile;
 		} else if(typeof options.fileIn === 'object' && options.fileIn instanceof Array && options.type == 'gcc') {
 			this.fileIn = options.fileIn;
 		}
@@ -103,13 +97,7 @@ var minify = (function(undefined) {
 					break;
 			}
 
-			exec(command, { maxBuffer: this.buffer }, function (err, stdout, stderr) {
-
-				if (minify.fileIn === minify.tempFile) {
-					// remove the temp concat file here
-					_fs.unlinkSync(minify.tempFile);
-				}
-
+			exec(command, { maxBuffer: this.buffer }, function (err, stdout, stderr) {}
 				if (minify.callback) {
 					minify.callback(err || null);
 				}
