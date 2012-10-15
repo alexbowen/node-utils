@@ -1,41 +1,44 @@
 var minify = (function(undefined) {
 
 	var exec = require('child_process').exec,
-			_fs = require('fs');
+		_fs = require('fs'),
+		out;
 
 	var minify = function(options) {
 
 		this.type = options.type;
 		this.tempFile = (options.tempPath || '') + new Date().getTime().toString();
 
-		if(options.type == 'gcc' && typeof options.fileIn === 'string') {
+		//prepare input file format
+		if (options.type == 'gcc' && typeof options.fileIn === 'string') {
 			this.fileIn = [options.fileIn];
-		}
-		else if(typeof options.fileIn === 'string') {
+		} else if(typeof options.fileIn === 'string') {
 			this.fileIn = options.fileIn;
 		}
 
-		if(typeof options.fileIn === 'object' && options.fileIn instanceof Array && options.type != 'gcc') {
-			var out = options.fileIn.map(function(path) {
+		//read the file contents
+		if (typeof options.fileIn === 'object' && options.fileIn instanceof Array && options.type != 'gcc') {
+			out = options.fileIn.map(function(path) {
 				return _fs.readFileSync(path, 'utf8');
 			});
 
 			_fs.writeFileSync(this.tempFile, out.join('\n'), 'utf8');
 
 			this.fileIn = this.tempFile;
-		}
-		else if(typeof options.fileIn === 'object' && options.fileIn instanceof Array && options.type == 'gcc') {
+		} else if(typeof options.fileIn === 'object' && options.fileIn instanceof Array && options.type == 'gcc') {
 			this.fileIn = options.fileIn;
 		}
 
-
+		//set options
 		this.fileOut = options.fileOut;
 		this.options = options.options || [];
 		this.buffer = options.buffer || 1000 * 1024;
+
 		if (typeof options.callback !== 'undefined') {
 			this.callback = options.callback;
 		}
 
+		//compress file
 		this.compress();
 	};
 
@@ -45,8 +48,8 @@ var minify = (function(undefined) {
 		fileOut 	: null,
 		callback 	: null,
 		buffer 		: null, // with larger files you will need a bigger buffer for closure compiler
-		compress	: function() {
-			var self = this, command, fileInCommand;
+		compress	: function () {
+			var minify = this, command, fileInCommand;
 
 			switch (this.type) {
 				case 'yui':
@@ -94,16 +97,16 @@ var minify = (function(undefined) {
 
 			exec(command, { maxBuffer: this.buffer }, function (err, stdout, stderr) {
 
-				if(self.fileIn === self.tempFile) {
+				if(minify.fileIn === minify.tempFile) {
 					// remove the temp concat file here
-					_fs.unlinkSync(self.tempFile);
+					_fs.unlinkSync(minify.tempFile);
 				}
 
-				if(self.callback){
+				if(minify.callback){
 					if (err) {
-						self.callback(err);
+						minify.callback(err);
 					} else {
-						self.callback(null);
+						minify.callback(null);
 					}
 				}
 			});
@@ -113,5 +116,17 @@ var minify = (function(undefined) {
 	return minify;
 }());
 
-exports.version = '0.4.2';
 exports.minify = minify;
+
+// EXAMPLE USAGE
+
+// var compressor = require('minify');
+
+// new compressor.minify({
+//     type: 'gcc',
+//     fileIn: 'example.js',
+//     fileOut: 'gcc.js',
+//     callback: function (err) {
+//         console.log(err ? 'Error: ' + err : 'minification successful using google closure compiler');
+//     }
+// });
