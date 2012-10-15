@@ -32,6 +32,8 @@ var minify = (function(undefined) {
 		//set options
 		this.fileOut = options.fileOut;
 		this.options = options.options || [];
+
+		//with larger files you will need a bigger buffer for closure compiler
 		this.buffer = options.buffer || 1000 * 1024;
 
 		if (typeof options.callback !== 'undefined') {
@@ -47,7 +49,7 @@ var minify = (function(undefined) {
 		fileIn 		: null,
 		fileOut 	: null,
 		callback 	: null,
-		buffer 		: null, // with larger files you will need a bigger buffer for closure compiler
+		buffer 		: null,
 		compress	: function () {
 			var minify = this, command, fileInCommand;
 
@@ -97,17 +99,13 @@ var minify = (function(undefined) {
 
 			exec(command, { maxBuffer: this.buffer }, function (err, stdout, stderr) {
 
-				if(minify.fileIn === minify.tempFile) {
+				if (minify.fileIn === minify.tempFile) {
 					// remove the temp concat file here
 					_fs.unlinkSync(minify.tempFile);
 				}
 
-				if(minify.callback){
-					if (err) {
-						minify.callback(err);
-					} else {
-						minify.callback(null);
-					}
+				if (minify.callback) {
+					minify.callback(err || null);
 				}
 			});
 		}
