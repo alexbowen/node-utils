@@ -4,6 +4,12 @@ var minify = (function(undefined) {
 		_fs = require('fs'),
 		out;
 
+	/**
+	 * minify.js
+	 * minify javascript using GCC | Uglify | YUI (CSS too)
+	 * @param  {object} options see below
+	 * @return {void}
+	 */
 	var minify = function(options) {
 
 		this.type = options.type;
