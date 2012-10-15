@@ -4,7 +4,7 @@ var minify = (function(undefined) {
 			_fs = require('fs');
 
 	var minify = function(options) {
-		
+
 		this.type = options.type;
 		this.tempFile = (options.tempPath || '') + new Date().getTime().toString();
 
@@ -83,7 +83,12 @@ var minify = (function(undefined) {
 								this.options.join(' ');
 					break;
 				case 'uglifyjs':
-					command = '"' + __dirname  + '/node_modules/uglify-js/bin/uglifyjs" --output "' + this.fileOut + '" --no-copyright "' + this.fileIn + '" ' + this.options.join(' ');
+					command = '"' + __dirname  +
+								'/node_modules/uglify-js/bin/uglifyjs" --output "' +
+								this.fileOut +
+								'" --no-copyright "' +
+								this.fileIn + '" ' +
+								this.options.join(' ');
 					break;
 			}
 
