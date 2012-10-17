@@ -97,7 +97,7 @@ var minify = (function(undefined) {
 					break;
 			}
 
-			exec(command, { maxBuffer: this.buffer }, function (err, stdout, stderr) {}
+			exec(command, { maxBuffer: this.buffer }, function (err, stdout, stderr) {
 				if (minify.callback) {
 					minify.callback(err || null);
 				}

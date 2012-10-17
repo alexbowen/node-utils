@@ -18,18 +18,19 @@ var concatenate = function (extension, destination, source) {
         console.log(destination + ' created from: ' + EOL + files);
     };
 
-    //create array from contents of source directory
-    _fs.readdir(source, function (err, contents) {
+    var callback = function (err, contents) {
         for (var file in contents) {
             if (contents[file].indexOf('.' + extension) > -1) {
-                files.push(source+ contents[file]);
+                files.push(source + contents[file]);
             }
         }
-
         concat(destination, files);
-    });
+    };
+
+    //create array from contents of source directory
+    _fs.readdir(source, callback);
 };
 
-concatenate('js', '../../public/js/concat.js', '../');
+concatenate(process.argv[2], process.argv[3], process.argv[4]);
 
 exports.concatenate = concatenate;
